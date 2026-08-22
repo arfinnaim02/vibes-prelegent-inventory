@@ -187,8 +187,11 @@ def prepare_df(raw: pd.DataFrame) -> pd.DataFrame:
             df[c] = 0
         df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0)
 
-    for c in ["Normalized Product", "Category", "Original Name", "Size", "Color", "SKU", "Replenish Eligible"]:
+    for c in ["Normalized Product", "Category", "Original Name", "Color", "SKU", "Replenish Eligible"]:
         df[c] = df[c].fillna("N/A").astype(str).str.strip()
+
+    # Normalize Size to uppercase so 'm' and 'M' merge into one size
+    df["Size"] = df["Size"].fillna("N/A").astype(str).str.strip().str.upper()
 
     df["Mall Stock"] = df["Salable Stock"]
     df["Warehouse Stock"] = df["WI Stock"]
@@ -202,10 +205,8 @@ def prepare_df(raw: pd.DataFrame) -> pd.DataFrame:
 
 def add_scenario_columns(df: pd.DataFrame, target_floor: int, mall_floor: int) -> pd.DataFrame:
     x = df.copy()
-    # First use stock already at Prelegent warehouse to fill mall shortages.
     x["Mall Gap"] = (mall_floor - x["Salable Stock"]).clip(lower=0)
     x["Move WI → Mall"] = x[["Mall Gap", "WI Stock"]].min(axis=1).where(~x["Return Block"], 0)
-    # Then consider additional VIBES shipment against total stock already physically at Prelegent.
     x["Safe Send"] = (target_floor - x["Current Physical"]).clip(lower=0).where(~x["Return Block"], 0)
     x["Safe Send"] = x["Safe Send"].astype(int)
     x["Move WI → Mall"] = x["Move WI → Mall"].astype(int)
@@ -425,18 +426,20 @@ with pages[0]:
 # -----------------------------
 with pages[1]:
     st.markdown('<div class="section-title">Product / Variant Explorer</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-sub">Filter a product, then click a variant row to inspect the exact SKU, size, colour and action.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-sub">Filter a product or full category, then inspect the exact SKU, size, colour and action.</div>', unsafe_allow_html=True)
 
     fc1, fc2 = st.columns([1,2])
     categories = ["All Categories"] + sorted(df["Category"].dropna().unique().tolist())
     with fc1:
         selected_cat = st.selectbox("Category", categories, key="prod_cat")
     sub = df if selected_cat == "All Categories" else df[df["Category"] == selected_cat]
-    products = sorted(sub["Normalized Product"].dropna().unique().tolist())
+    
+    products = ["All Products / Styles"] + sorted(sub["Normalized Product"].dropna().unique().tolist())
     with fc2:
         selected_product = st.selectbox("Product / Style", products, key="prod_style")
 
-    prod = sub[sub["Normalized Product"] == selected_product].copy()
+    prod = sub if selected_product == "All Products / Styles" else sub[sub["Normalized Product"] == selected_product].copy()
+    
     mall = prod["Salable Stock"].sum(); wh = prod["WI Stock"].sum(); ret = prod["Return Stock"].sum(); send = prod["Safe Send"].sum(); move = prod["Move WI → Mall"].sum()
     kc = st.columns(5)
     with kc[0]: kpi("Mall", fmt_int(mall), "Salable", "blue")
@@ -453,14 +456,15 @@ with pages[1]:
         with tab:
             p = pivot_matrix(prod, metric)
             if p.empty:
-                st.info("No data for this product.")
+                st.info("No data for this product/category selection.")
             else:
                 l,r = st.columns([1.2,1])
                 with l:
-                    st.markdown(f"**Colour × Size Matrix — {metric}**")
+                    title_context = f"{selected_cat} (All Products)" if selected_product == "All Products / Styles" else selected_product
+                    st.markdown(f"**Colour × Size Matrix — {metric} ({title_context})**")
                     st.dataframe(matrix_styler(p, tone), use_container_width=True)
                 with r:
-                    fig = heatmap_matrix(p, f"{selected_product} · {metric}")
+                    fig = heatmap_matrix(p, f"{title_context} · {metric}")
                     if fig: st.plotly_chart(fig, use_container_width=True)
 
     st.markdown('<div class="section-title">Variant Inspector</div>', unsafe_allow_html=True)

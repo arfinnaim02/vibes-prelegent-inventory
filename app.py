@@ -10,614 +10,2452 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+
 APP_DIR = Path(__file__).resolve().parent
-DEFAULT_FILE = APP_DIR / "data" / "Prelegent_Inventory_Analysis.xlsx"
+DEFAULT_FILE = (
+    APP_DIR
+    / "data"
+    / "Vibes_Current_Stock_Prelegant_Mall.xlsx"
+)
 
 st.set_page_config(
-    page_title="VIBES × Prelegent Inventory Portal",
+    page_title="VIBES Prelegent Inventory Portal",
     page_icon="◆",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# -----------------------------
-# Premium UI
-# -----------------------------
+
+# ============================================================
+# PREMIUM DESIGN
+# ============================================================
+
 st.markdown(
     """
 <style>
 :root {
-  --ink:#101828; --muted:#667085; --line:#E4E7EC; --paper:#FFFFFF;
-  --bg:#F5F7FA; --green:#067647; --green-bg:#ECFDF3;
-  --red:#B42318; --red-bg:#FEF3F2; --amber:#B54708; --amber-bg:#FFFAEB;
-  --blue:#175CD3; --blue-bg:#EFF8FF; --purple:#6941C6; --purple-bg:#F9F5FF;
+    --ink:#102A43;
+    --muted:#627D98;
+    --line:#D9E2EC;
+    --bg:#F4F7FA;
+    --teal:#2A9D8F;
+    --blue:#1F6E8C;
+    --navy:#102A43;
 }
-.stApp { background: var(--bg); }
-.block-container { padding-top: 1.4rem; padding-bottom: 3rem; max-width: 1600px; }
-[data-testid="stSidebar"] { background: #0B0F19; }
-[data-testid="stSidebar"] * { color: #F9FAFB; }
-[data-testid="stSidebar"] .stSelectbox label,
-[data-testid="stSidebar"] .stSlider label,
-[data-testid="stSidebar"] .stFileUploader label { color:#F9FAFB !important; }
-[data-testid="stSidebar"] .stCaptionContainer { color:#D0D5DD !important; }
 
-.portal-title { font-size: 2rem; font-weight: 850; letter-spacing:-0.04em; color:#101828; margin-bottom:0.15rem; }
-.portal-sub { color:#667085; font-size:0.98rem; margin-bottom:1.2rem; }
-.eyebrow { color:#475467; font-size:0.73rem; text-transform:uppercase; letter-spacing:.11em; font-weight:750; }
-.section-title { font-size:1.25rem; font-weight:800; color:#101828; margin:1.25rem 0 .55rem; }
-.section-sub { color:#667085; margin-top:-.35rem; margin-bottom:.8rem; font-size:.9rem; }
+.stApp {
+    background:var(--bg);
+}
 
-.kpi-card { background:#fff; border:1px solid #EAECF0; border-radius:18px; padding:18px 18px 15px; min-height:122px; box-shadow:0 1px 2px rgba(16,24,40,.03); }
-.kpi-label { font-size:.78rem; color:#667085; text-transform:uppercase; letter-spacing:.055em; font-weight:700; }
-.kpi-value { margin-top:8px; font-size:1.75rem; font-weight:850; color:#101828; letter-spacing:-.035em; }
-.kpi-note { margin-top:5px; font-size:.78rem; color:#98A2B3; }
-.kpi-green { border-top:4px solid #12B76A; }
-.kpi-blue { border-top:4px solid #2E90FA; }
-.kpi-red { border-top:4px solid #F04438; }
-.kpi-amber { border-top:4px solid #F79009; }
-.kpi-purple { border-top:4px solid #7F56D9; }
-.kpi-dark { border-top:4px solid #101828; }
+.block-container {
+    padding-top:1.2rem;
+    padding-bottom:3rem;
+    max-width:1680px;
+}
 
-.notice { background:#fff; border:1px solid #EAECF0; border-radius:14px; padding:13px 15px; color:#475467; font-size:.88rem; }
-.notice strong { color:#101828; }
-.success-box { background:#ECFDF3; border:1px solid #ABEFC6; border-radius:14px; padding:13px 15px; color:#067647; font-size:.88rem; }
-.danger-box { background:#FEF3F2; border:1px solid #FECDCA; border-radius:14px; padding:13px 15px; color:#B42318; font-size:.88rem; }
-.action-pill { display:inline-block; border-radius:999px; padding:5px 9px; font-size:.73rem; font-weight:800; }
-.pill-send {background:#EFF8FF;color:#175CD3}.pill-return{background:#FEF3F2;color:#B42318}.pill-move{background:#FFFAEB;color:#B54708}.pill-hold{background:#ECFDF3;color:#067647}
+[data-testid="stSidebar"] {
+    background:#0B1F33;
+}
 
-div[data-testid="stDataFrame"] { border:1px solid #EAECF0; border-radius:14px; overflow:hidden; background:white; }
-div[data-testid="stPlotlyChart"] { background:white; border:1px solid #EAECF0; border-radius:16px; padding:6px; }
-.stTabs [data-baseweb="tab-list"] { gap:8px; }
-.stTabs [data-baseweb="tab"] { border-radius:10px; padding:8px 14px; background:#fff; border:1px solid #EAECF0; }
-.stTabs [aria-selected="true"] { background:#101828 !important; color:#fff !important; }
-hr { border:none; border-top:1px solid #EAECF0; margin:1.1rem 0; }
+[data-testid="stSidebar"] * {
+    color:#F8FAFC;
+}
+
+[data-testid="stSidebar"] label {
+    color:#F8FAFC!important;
+}
+
+.portal-title {
+    font-size:2rem;
+    font-weight:850;
+    letter-spacing:-.04em;
+    color:var(--ink);
+    margin:.1rem 0;
+}
+
+.portal-sub {
+    color:var(--muted);
+    font-size:.95rem;
+    margin-bottom:1rem;
+}
+
+.eyebrow {
+    color:#486581;
+    font-size:.72rem;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    font-weight:800;
+}
+
+.section-title {
+    font-size:1.22rem;
+    font-weight:800;
+    color:var(--ink);
+    margin:1.15rem 0 .4rem;
+}
+
+.section-sub {
+    color:var(--muted);
+    margin:-.15rem 0 .8rem;
+    font-size:.9rem;
+}
+
+.kpi-card {
+    background:#fff;
+    border:1px solid #E4E7EC;
+    border-radius:17px;
+    padding:17px;
+    min-height:116px;
+    box-shadow:0 2px 6px rgba(16,42,67,.04);
+}
+
+.kpi-label {
+    font-size:.76rem;
+    color:#627D98;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    font-weight:750;
+}
+
+.kpi-value {
+    margin-top:8px;
+    font-size:1.72rem;
+    font-weight:850;
+    color:#102A43;
+    letter-spacing:-.035em;
+}
+
+.kpi-note {
+    margin-top:4px;
+    font-size:.76rem;
+    color:#829AB1;
+}
+
+.kpi-teal {
+    border-top:4px solid #2A9D8F;
+}
+
+.kpi-blue {
+    border-top:4px solid #1F6E8C;
+}
+
+.kpi-red {
+    border-top:4px solid #E05252;
+}
+
+.kpi-amber {
+    border-top:4px solid #E9A23B;
+}
+
+.kpi-dark {
+    border-top:4px solid #102A43;
+}
+
+.kpi-purple {
+    border-top:4px solid #7B61A8;
+}
+
+.notice {
+    background:#fff;
+    border:1px solid #D9E2EC;
+    border-radius:13px;
+    padding:12px 14px;
+    color:#486581;
+    font-size:.86rem;
+}
+
+.notice strong {
+    color:#102A43;
+}
+
+.filter-summary {
+    background:#EAF6FA;
+    border:1px solid #B8E0EA;
+    border-radius:13px;
+    padding:11px 14px;
+    color:#175267;
+    font-size:.86rem;
+    margin-bottom:10px;
+}
+
+.return-banner {
+    background:linear-gradient(135deg,#FFF5F5,#FFF);
+    border:1px solid #FED7D7;
+    border-left:5px solid #E05252;
+    border-radius:14px;
+    padding:14px 16px;
+    color:#9B2C2C;
+    font-size:.88rem;
+}
+
+.return-banner strong {
+    color:#742A2A;
+}
+
+div[data-testid="stDataFrame"] {
+    border:1px solid #D9E2EC;
+    border-radius:14px;
+    overflow:hidden;
+    background:white;
+}
+
+div[data-testid="stPlotlyChart"] {
+    background:white;
+    border:1px solid #E4E7EC;
+    border-radius:16px;
+    padding:5px;
+}
+
+.stTabs [data-baseweb="tab-list"] {
+    gap:7px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    border-radius:10px;
+    padding:8px 13px;
+    background:#fff;
+    border:1px solid #D9E2EC;
+}
+
+.stTabs [aria-selected="true"] {
+    background:#102A43!important;
+    color:#fff!important;
+}
 </style>
 """,
     unsafe_allow_html=True,
 )
 
-NUMERIC_COLS = [
-    "Price", "Discount Price", "Stock", "WI Stock", "WI Out Stock",
-    "Salable Stock", "Return Stock", "Effective Available", "Planning Send Gap"
+
+# ============================================================
+# CONFIGURATION
+# ============================================================
+
+CATEGORY_RULES = [
+    (r"cap", "Accessories"),
+    (r"punjabi", "Punjabi"),
+    (r"hoodie", "Hoodies"),
+    (r"sweatpant", "Sweatpants"),
+    (r"jacket|funnel", "Jackets & Sets"),
+    (r"short pant", "Shorts"),
+    (r"formal pant", "Formal Pants"),
+    (r"jeans|denim", "Jeans & Denim"),
+    (r"polo", "Polo Shirts"),
+    (r"shirt", "Shirts"),
+    (r"drop shoulder", "T-Shirts"),
+    (r"boxer", "Innerwear"),
 ]
-REQUIRED_CORE = ["Normalized Product", "Category", "Size", "Color", "Salable Stock", "WI Stock", "Return Stock"]
+
+SIZE_ALIASES = {
+    "NA": "N/A",
+    "N/A": "N/A",
+    "FREE": "N/A",
+    "FREE SIZE": "N/A",
+    "XXL": "2XL",
+    "2XL": "2XL",
+    "XXXL": "3XL",
+    "3XL": "3XL",
+    "XXXXL": "4XL",
+    "4XL": "4XL",
+}
+
+NUMERIC_STOCK_COLS = [
+    "Stock",
+    "WI Stock",
+    "WI Out Stock",
+    "Total Stock",
+    "Return Stock",
+]
 
 
-def fmt_int(v: float | int) -> str:
-    return f"{int(round(float(v))):,}"
+# ============================================================
+# HELPER FUNCTIONS
+# ============================================================
+
+def fmt_int(value):
+    return f"{int(round(float(value))):,}"
 
 
-def fmt_money(v: float | int) -> str:
-    return f"৳{float(v):,.0f}"
+def fmt_money(value):
+    return f"৳{float(value):,.0f}"
 
 
-def kpi(label: str, value: str, note: str, tone: str = "dark") -> None:
+def kpi(label, value, note, tone="dark"):
     st.markdown(
-        f'<div class="kpi-card kpi-{tone}"><div class="kpi-label">{label}</div>'
-        f'<div class="kpi-value">{value}</div><div class="kpi-note">{note}</div></div>',
+        f"""
+        <div class="kpi-card kpi-{tone}">
+            <div class="kpi-label">{label}</div>
+            <div class="kpi-value">{value}</div>
+            <div class="kpi-note">{note}</div>
+        </div>
+        """,
         unsafe_allow_html=True,
     )
 
 
-def natural_size_key(value: object):
-    s = str(value).strip().upper()
-    aliases = {"N/A": 0, "NA": 0, "FREE": 1, "FREESIZE": 1, "XS": 10, "S": 20, "M": 30,
-               "L": 40, "XL": 50, "2XL": 60, "XXL": 60, "3XL": 70, "XXXL": 70,
-               "4XL": 80, "XXXXL": 80, "5XL": 90}
-    if s in aliases:
-        return (0, aliases[s], s)
-    nums = re.findall(r"\d+(?:\.\d+)?", s)
-    if nums:
-        return (1, float(nums[0]), s)
-    return (2, 9999, s)
+def clean_label(value, fallback="N/A"):
+    if pd.isna(value) or not str(value).strip():
+        return fallback
+
+    return re.sub(r"\s+", " ", str(value).strip())
 
 
-def order_sizes(values: Iterable[object]) -> list[str]:
-    vals = [str(v).strip() for v in values if pd.notna(v) and str(v).strip()]
-    return sorted(dict.fromkeys(vals), key=natural_size_key)
+def display_case(value):
+    text = clean_label(value)
+
+    return " ".join(
+        word
+        if word.isupper() and len(word) <= 4
+        else word.capitalize()
+        for word in text.split()
+    )
 
 
-@st.cache_data(show_spinner=False)
-def load_inventory_from_bytes(file_bytes: bytes, filename: str) -> pd.DataFrame:
-    xls = pd.ExcelFile(io.BytesIO(file_bytes))
-    preferred = "SKU Detail" if "SKU Detail" in xls.sheet_names else None
-    if preferred:
-        raw = pd.read_excel(io.BytesIO(file_bytes), sheet_name=preferred, header=3)
-    else:
-        raw = None
-        for sh in xls.sheet_names:
-            candidate = pd.read_excel(io.BytesIO(file_bytes), sheet_name=sh)
-            if {"Salable Stock", "WI Stock", "Return Stock"}.issubset(set(candidate.columns.astype(str))):
-                raw = candidate
-                break
-        if raw is None:
-            raise ValueError("Could not find a sheet with Salable Stock, WI Stock and Return Stock columns.")
-    return prepare_df(raw)
+def normalize_size(value):
+    size = clean_label(value).upper()
+    return SIZE_ALIASES.get(size, size)
 
 
-@st.cache_data(show_spinner=False)
-def load_inventory_from_path(path_str: str) -> pd.DataFrame:
-    path = Path(path_str)
-    xls = pd.ExcelFile(path)
-    if "SKU Detail" in xls.sheet_names:
-        raw = pd.read_excel(path, sheet_name="SKU Detail", header=3)
-    else:
-        raw = None
-        for sh in xls.sheet_names:
-            candidate = pd.read_excel(path, sheet_name=sh)
-            if {"Salable Stock", "WI Stock", "Return Stock"}.issubset(set(candidate.columns.astype(str))):
-                raw = candidate
-                break
-        if raw is None:
-            raise ValueError("Could not find a usable inventory sheet.")
-    return prepare_df(raw)
+def natural_size_key(value):
+    size = normalize_size(value)
+
+    alpha = {
+        "N/A": 0,
+        "XS": 10,
+        "S": 20,
+        "M": 30,
+        "L": 40,
+        "XL": 50,
+        "2XL": 60,
+        "3XL": 70,
+        "4XL": 80,
+        "5XL": 90,
+    }
+
+    if size in alpha:
+        return 0, alpha[size], size
+
+    combination = re.fullmatch(
+        r"(XS|S|M|L|XL|2XL|3XL|4XL)-(\d+)",
+        size,
+    )
+
+    if combination:
+        return (
+            2,
+            int(combination.group(2)),
+            alpha.get(combination.group(1), 999),
+            size,
+        )
+
+    numbers = re.findall(r"\d+(?:\.\d+)?", size)
+
+    if numbers:
+        return 1, float(numbers[0]), size
+
+    return 3, 9999, size
 
 
-def prepare_df(raw: pd.DataFrame) -> pd.DataFrame:
+def order_sizes(values: Iterable[object]):
+    sizes = {
+        normalize_size(value)
+        for value in values
+        if pd.notna(value) and str(value).strip()
+    }
+
+    return sorted(sizes, key=natural_size_key)
+
+
+def infer_category(product):
+    for pattern, category in CATEGORY_RULES:
+        if re.search(pattern, product.lower()):
+            return category
+
+    return "Other Apparel"
+
+
+def parse_price(series):
+    return pd.to_numeric(
+        series.astype(str).str.replace(
+            r"[^0-9.\-]",
+            "",
+            regex=True,
+        ),
+        errors="coerce",
+    ).fillna(0)
+
+
+def canonicalize_case(series):
+    cleaned = series.map(clean_label)
+    lookup = {}
+
+    for value in cleaned:
+        lookup.setdefault(
+            value.casefold(),
+            display_case(value),
+        )
+
+    return cleaned.map(
+        lambda value: lookup[value.casefold()]
+    )
+
+
+def find_inventory_sheet(file_obj):
+    excel_file = pd.ExcelFile(file_obj)
+
+    required = {
+        "Name",
+        "Size",
+        "Color",
+        "SKU",
+        "Total Stock",
+    }
+
+    for sheet in excel_file.sheet_names:
+        candidate = pd.read_excel(
+            file_obj,
+            sheet_name=sheet,
+        )
+
+        columns = {
+            str(column).strip()
+            for column in candidate.columns
+        }
+
+        if required.issubset(columns):
+            return candidate
+
+    raise ValueError(
+        "No sheet contains Name, Size, Color, SKU "
+        "and Total Stock columns."
+    )
+
+
+def prepare_df(raw):
     df = raw.copy()
-    df.columns = [str(c).strip() for c in df.columns]
+
+    df.columns = [
+        str(column).strip()
+        for column in df.columns
+    ]
+
     df = df.dropna(how="all")
 
-    if "Normalized Product" not in df.columns:
-        if "Product" in df.columns:
-            df["Normalized Product"] = df["Product"]
-        elif "Original Name" in df.columns:
-            df["Normalized Product"] = df["Original Name"]
-        else:
-            df["Normalized Product"] = "Unclassified Product"
-    if "Category" not in df.columns:
-        df["Category"] = "Unclassified"
-    if "Original Name" not in df.columns:
-        df["Original Name"] = df["Normalized Product"]
-    if "Size" not in df.columns:
-        df["Size"] = "N/A"
-    if "Color" not in df.columns:
-        df["Color"] = "N/A"
-    if "SKU" not in df.columns:
-        df["SKU"] = ""
+    required = [
+        "Name",
+        "Size",
+        "Color",
+        "SKU",
+        "Total Stock",
+    ]
+
+    missing = [
+        column
+        for column in required
+        if column not in df.columns
+    ]
+
+    if missing:
+        raise ValueError(
+            f"Missing required columns: {', '.join(missing)}"
+        )
+
+    df["SKU"] = (
+        df["SKU"]
+        .fillna("")
+        .astype(str)
+        .str.strip()
+    )
+
+    df["Name"] = (
+        df["Name"]
+        .fillna("")
+        .astype(str)
+        .str.strip()
+    )
+
+    df = df[
+        df["SKU"].ne("")
+        & ~df["Name"].str.casefold().eq("total")
+    ].copy()
+
+    df["Product"] = canonicalize_case(df["Name"])
+    df["Category"] = df["Product"].map(infer_category)
+    df["Size"] = df["Size"].map(normalize_size)
+    df["Color"] = canonicalize_case(df["Color"])
+
+    if "Brands" in df.columns:
+        df["Brand"] = df["Brands"]
+    else:
+        df["Brand"] = "Vibes"
+
+    df["Brand"] = (
+        df["Brand"]
+        .fillna("Vibes")
+        .astype(str)
+        .str.strip()
+    )
+
+    if "Status" in df.columns:
+        df["Status"] = df["Status"]
+    else:
+        df["Status"] = "Active"
+
+    df["Status"] = (
+        df["Status"]
+        .fillna("Active")
+        .astype(str)
+        .str.strip()
+    )
+
     if "Price" not in df.columns:
         df["Price"] = 0
-    if "WI Out Stock" not in df.columns:
-        df["WI Out Stock"] = 0
-    if "Replenish Eligible" not in df.columns:
-        df["Replenish Eligible"] = "YES"
 
-    for c in NUMERIC_COLS:
-        if c not in df.columns:
-            df[c] = 0
-        df[c] = pd.to_numeric(df[c], errors="coerce").fillna(0)
+    df["Price"] = parse_price(df["Price"])
 
-    for c in ["Normalized Product", "Category", "Original Name", "Color", "SKU", "Replenish Eligible"]:
-        df[c] = df[c].fillna("N/A").astype(str).str.strip()
+    for column in NUMERIC_STOCK_COLS:
+        if column not in df.columns:
+            df[column] = 0
 
-    # Normalize Size to uppercase so 'm' and 'M' merge into one size
-    df["Size"] = df["Size"].fillna("N/A").astype(str).str.strip().str.upper()
+        df[column] = pd.to_numeric(
+            df[column],
+            errors="coerce",
+        ).fillna(0)
 
-    df["Mall Stock"] = df["Salable Stock"]
-    df["Warehouse Stock"] = df["WI Stock"]
-    df["Current Physical"] = df["Salable Stock"] + df["WI Stock"]
-    df["Return Value"] = df["Return Stock"] * df["Price"]
-    df["Mall Retail Value"] = df["Salable Stock"] * df["Price"]
-    df["Physical Retail Value"] = df["Current Physical"] * df["Price"]
-    df["Return Block"] = (df["Return Stock"] > 0) | (~df["Replenish Eligible"].str.upper().eq("YES"))
-    return df
+    # All current-stock calculations use Total Stock only.
+    df["Stock Value"] = (
+        df["Total Stock"] * df["Price"]
+    )
 
+    # Returns are calculated separately.
+    df["Return Value"] = (
+        df["Return Stock"] * df["Price"]
+    )
 
-def add_scenario_columns(df: pd.DataFrame, target_floor: int, mall_floor: int) -> pd.DataFrame:
-    x = df.copy()
-    x["Mall Gap"] = (mall_floor - x["Salable Stock"]).clip(lower=0)
-    x["Move WI → Mall"] = x[["Mall Gap", "WI Stock"]].min(axis=1).where(~x["Return Block"], 0)
-    x["Safe Send"] = (target_floor - x["Current Physical"]).clip(lower=0).where(~x["Return Block"], 0)
-    x["Safe Send"] = x["Safe Send"].astype(int)
-    x["Move WI → Mall"] = x["Move WI → Mall"].astype(int)
-    x["Return Qty"] = x["Return Stock"].astype(int)
+    df["Return Status"] = "No Return"
 
-    conditions = [
-        x["Return Block"],
-        x["Move WI → Mall"] > 0,
-        x["Safe Send"] > 0,
-    ]
-    choices = ["RETURN / DO NOT SEND", "MOVE WAREHOUSE → MALL", "SEND FROM VIBES"]
-    x["Action"] = "HOLD / MAINTAIN"
-    for cond, choice in reversed(list(zip(conditions, choices))):
-        x.loc[cond, "Action"] = choice
-    return x
+    df.loc[
+        df["Return Stock"].gt(0),
+        "Return Status",
+    ] = "Return Required"
 
+    df["Stock Status"] = "Healthy (3+)"
 
-def pivot_matrix(df: pd.DataFrame, metric: str) -> pd.DataFrame:
-    if df.empty:
-        return pd.DataFrame()
-    ordered = order_sizes(df["Size"].unique())
-    p = pd.pivot_table(df, index="Color", columns="Size", values=metric, aggfunc="sum", fill_value=0)
-    p = p.reindex(columns=[c for c in ordered if c in p.columns], fill_value=0)
-    p["Total"] = p.sum(axis=1)
-    total = p.sum(axis=0)
-    p.loc["TOTAL"] = total
-    return p.astype(int)
+    df.loc[
+        df["Total Stock"].eq(0),
+        "Stock Status",
+    ] = "Out of Stock"
 
+    df.loc[
+        df["Total Stock"].between(1, 2),
+        "Stock Status",
+    ] = "Low Stock (1-2)"
 
-def matrix_styler(p: pd.DataFrame, tone: str = "blue"):
-    palette = {
-        "blue": ("#F5FAFF", "#175CD3"),
-        "green": ("#F3FFF7", "#067647"),
-        "red": ("#FFF5F4", "#B42318"),
-        "amber": ("#FFFAEB", "#B54708"),
-        "purple": ("#F9F5FF", "#6941C6"),
+    size_order = order_sizes(df["Size"])
+
+    size_lookup = {
+        size: index
+        for index, size in enumerate(size_order)
     }
-    bg, fg = palette[tone]
-    return (
-        p.style
-        .format("{:,.0f}")
-        .background_gradient(cmap="Blues" if tone == "blue" else "Greens" if tone == "green" else "Reds" if tone == "red" else "Purples", axis=None)
-        .set_properties(**{"text-align":"center", "font-weight":"600"})
-        .set_table_styles([
-            {"selector":"th", "props":[("background-color",fg),("color","white"),("font-weight","800"),("text-align","center")]},
-            {"selector":"td", "props":[("border-color","#EAECF0")]},
-        ])
+
+    df["Size Rank"] = df["Size"].map(size_lookup)
+
+    return df.reset_index(drop=True)
+
+
+@st.cache_data(show_spinner=False)
+def load_inventory_from_path(path_str):
+    return prepare_df(
+        find_inventory_sheet(Path(path_str))
     )
 
 
-def plot_bar(data: pd.DataFrame, x: str, y: str, title: str, color: str | None = None, orientation="v"):
+@st.cache_data(show_spinner=False)
+def load_inventory_from_bytes(file_bytes):
+    return prepare_df(
+        find_inventory_sheet(
+            io.BytesIO(file_bytes)
+        )
+    )
+
+
+def filter_inventory(
+    data,
+    search_text="",
+    categories=None,
+    products=None,
+    sizes=None,
+    colors=None,
+    stock_states=None,
+):
+    result = data
+
+    filters = [
+        ("Category", categories),
+        ("Product", products),
+        ("Size", sizes),
+        ("Color", colors),
+        ("Stock Status", stock_states),
+    ]
+
+    for column, values in filters:
+        if values:
+            result = result[
+                result[column].isin(values)
+            ]
+
+    if search_text.strip():
+        search_mask = pd.Series(
+            False,
+            index=result.index,
+        )
+
+        for column in [
+            "Product",
+            "SKU",
+            "Color",
+            "Size",
+            "Category",
+        ]:
+            search_mask |= (
+                result[column]
+                .astype(str)
+                .str.contains(
+                    search_text.strip(),
+                    case=False,
+                    regex=False,
+                    na=False,
+                )
+            )
+
+        result = result[search_mask]
+
+    return result.copy()
+
+
+def size_summary(data):
+    if data.empty:
+        return pd.DataFrame(
+            columns=[
+                "Size",
+                "Total Stock",
+                "Returns",
+                "Variants",
+                "Out of Stock",
+            ]
+        )
+
+    summary = (
+        data.groupby(
+            "Size",
+            as_index=False,
+        )
+        .agg(
+            **{
+                "Total Stock": (
+                    "Total Stock",
+                    "sum",
+                ),
+                "Returns": (
+                    "Return Stock",
+                    "sum",
+                ),
+                "Variants": (
+                    "SKU",
+                    "nunique",
+                ),
+                "Out of Stock": (
+                    "Total Stock",
+                    lambda values: int(
+                        values.eq(0).sum()
+                    ),
+                ),
+            }
+        )
+    )
+
+    ordering = {
+        value: index
+        for index, value in enumerate(
+            order_sizes(summary["Size"])
+        )
+    }
+
+    summary["_order"] = summary["Size"].map(
+        ordering
+    )
+
+    return (
+        summary
+        .sort_values("_order")
+        .drop(columns="_order")
+    )
+
+
+def color_size_matrix(
+    data,
+    value_column="Total Stock",
+):
+    if data.empty:
+        return pd.DataFrame()
+
+    matrix = pd.pivot_table(
+        data,
+        index="Color",
+        columns="Size",
+        values=value_column,
+        aggfunc="sum",
+        fill_value=0,
+    )
+
+    matrix = matrix.reindex(
+        columns=order_sizes(data["Size"]),
+        fill_value=0,
+    )
+
+    matrix["Total"] = matrix.sum(axis=1)
+    matrix.loc["TOTAL"] = matrix.sum(axis=0)
+
+    return matrix.astype(int)
+
+
+def product_size_matrix(data):
+    if data.empty:
+        return pd.DataFrame()
+
+    matrix = pd.pivot_table(
+        data,
+        index=["Category", "Product"],
+        columns="Size",
+        values="Total Stock",
+        aggfunc="sum",
+        fill_value=0,
+    )
+
+    matrix = matrix.reindex(
+        columns=order_sizes(data["Size"]),
+        fill_value=0,
+    )
+
+    matrix["Grand Total"] = matrix.sum(axis=1)
+
+    return (
+        matrix
+        .astype(int)
+        .sort_values(
+            "Grand Total",
+            ascending=False,
+        )
+    )
+
+
+def matrix_style(matrix):
+    return (
+        matrix.style
+        .format("{:,.0f}")
+        .background_gradient(
+            cmap="BuGn",
+            axis=None,
+        )
+        .set_properties(
+            **{
+                "text-align": "center",
+                "font-weight": "600",
+            }
+        )
+        .set_table_styles(
+            [
+                {
+                    "selector": "th",
+                    "props": [
+                        (
+                            "background-color",
+                            "#1F6E8C",
+                        ),
+                        ("color", "white"),
+                        ("font-weight", "800"),
+                        ("text-align", "center"),
+                    ],
+                }
+            ]
+        )
+    )
+
+
+def bar_chart(
+    data,
+    x,
+    y,
+    title,
+    orientation="v",
+):
     if data.empty:
         return None
+
     if orientation == "h":
-        fig = px.bar(data, x=y, y=x, color=color, orientation="h", text_auto=True)
+        figure = px.bar(
+            data,
+            x=y,
+            y=x,
+            orientation="h",
+            text_auto=True,
+        )
     else:
-        fig = px.bar(data, x=x, y=y, color=color, text_auto=True)
-    fig.update_layout(
-        title=title, template="plotly_white", margin=dict(l=20,r=20,t=55,b=25),
-        legend_title_text="", height=390, font=dict(family="Arial", color="#344054"),
-        title_font=dict(size=17, color="#101828"), plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF"
+        figure = px.bar(
+            data,
+            x=x,
+            y=y,
+            text_auto=True,
+        )
+
+    figure.update_traces(
+        marker_color="#1F6E8C",
+        textposition="outside",
+        cliponaxis=False,
     )
-    fig.update_traces(marker_line_width=0, textposition="outside", cliponaxis=False)
-    return fig
+
+    figure.update_layout(
+        template="plotly_white",
+        title=title,
+        height=400,
+        margin=dict(
+            l=20,
+            r=20,
+            t=55,
+            b=35,
+        ),
+        showlegend=False,
+    )
+
+    return figure
 
 
-def plot_size_chart(df: pd.DataFrame, metric: str, title: str):
-    if df.empty:
-        return None
-    g = df.groupby("Size", as_index=False)[metric].sum()
-    order = order_sizes(g["Size"])
-    g["_order"] = g["Size"].map({s:i for i,s in enumerate(order)})
-    g = g.sort_values("_order")
-    fig = px.bar(g, x="Size", y=metric, text_auto=True)
-    fig.update_layout(title=title, template="plotly_white", height=360, margin=dict(l=20,r=20,t=55,b=25), showlegend=False)
-    fig.update_traces(marker_color="#101828", textposition="outside", cliponaxis=False)
-    return fig
+def stock_status_chart(data):
+    status = (
+        data.groupby(
+            "Stock Status",
+            as_index=False,
+        )["SKU"]
+        .nunique()
+        .rename(
+            columns={"SKU": "Variants"}
+        )
+    )
+
+    figure = px.pie(
+        status,
+        names="Stock Status",
+        values="Variants",
+        hole=.62,
+        color="Stock Status",
+        color_discrete_map={
+            "Out of Stock": "#E05252",
+            "Low Stock (1-2)": "#E9A23B",
+            "Healthy (3+)": "#2A9D8F",
+        },
+    )
+
+    figure.update_layout(
+        title="SKU Stock Health",
+        template="plotly_white",
+        height=400,
+        margin=dict(
+            l=20,
+            r=20,
+            t=55,
+            b=25,
+        ),
+        legend_title_text="",
+    )
+
+    return figure
 
 
-def heatmap_matrix(p: pd.DataFrame, title: str):
-    if p.empty:
-        return None
-    body = p.drop(index="TOTAL", errors="ignore").drop(columns="Total", errors="ignore")
-    if body.empty:
-        return None
-    fig = go.Figure(data=go.Heatmap(
-        z=body.values,
-        x=[str(c) for c in body.columns],
-        y=[str(i) for i in body.index],
-        text=body.values,
-        texttemplate="%{text}",
-        colorscale=[[0,"#F8FAFC"],[0.5,"#D0D5DD"],[1,"#101828"]],
-        colorbar=dict(title="Units"),
-        hovertemplate="Colour: %{y}<br>Size: %{x}<br>Units: %{z}<extra></extra>"
-    ))
-    fig.update_layout(title=title, height=max(330, 48*len(body.index)+120), margin=dict(l=20,r=20,t=55,b=30), template="plotly_white")
-    return fig
+def return_status_chart(data):
+    affected = int(
+        data.loc[
+            data["Return Stock"].gt(0),
+            "SKU",
+        ].nunique()
+    )
+
+    clear = int(
+        data["SKU"].nunique() - affected
+    )
+
+    status = pd.DataFrame(
+        {
+            "Status": [
+                "Return Required",
+                "No Return",
+            ],
+            "Variants": [
+                affected,
+                clear,
+            ],
+        }
+    )
+
+    figure = px.pie(
+        status,
+        names="Status",
+        values="Variants",
+        hole=.65,
+        color="Status",
+        color_discrete_map={
+            "Return Required": "#E05252",
+            "No Return": "#D9E2EC",
+        },
+    )
+
+    figure.update_layout(
+        title="Return-Affected SKU Share",
+        template="plotly_white",
+        height=400,
+        margin=dict(
+            l=20,
+            r=20,
+            t=55,
+            b=25,
+        ),
+        legend_title_text="",
+    )
+
+    return figure
 
 
-# -----------------------------
-# Sidebar / data
-# -----------------------------
+# ============================================================
+# SIDEBAR
+# ============================================================
+
 with st.sidebar:
     st.markdown("## VIBES × PRELEGENT")
-    st.caption("Premium Inventory Decision Portal")
+    st.caption("Current Inventory Portal")
     st.markdown("---")
-    upload = st.file_uploader("Upload latest inventory workbook", type=["xlsx"])
-    target_floor = st.slider("Target total stock / variant", min_value=1, max_value=10, value=2, step=1,
-                             help="Minimum desired units across Mall + Prelegent Warehouse before VIBES sends more.")
-    mall_floor = st.slider("Target mall floor / variant", min_value=0, max_value=5, value=1, step=1,
-                           help="If mall is below this level and WI Stock exists, portal suggests moving warehouse stock to mall first.")
+
+    upload = st.file_uploader(
+        "Upload latest stock workbook",
+        type=["xlsx"],
+    )
+
     st.markdown("---")
-    st.caption("Locked logic")
-    st.caption("• WI Out is movement, not current stock")
-    st.caption("• Return-stock variants are blocked from send")
-    st.caption("• Warehouse stock is used before new VIBES shipment")
+    st.caption("Inventory definitions")
+    st.caption("• Current inventory = Total Stock")
+    st.caption("• Low stock = 1–2 total units")
+    st.caption("• Returns = Return Stock")
+    st.caption("• Size aliases are normalized")
+    st.caption(
+        "• Product names are grouped case-insensitively"
+    )
+
+
+# ============================================================
+# LOAD INVENTORY
+# ============================================================
 
 try:
     if upload is not None:
-        base_df = load_inventory_from_bytes(upload.getvalue(), upload.name)
+        inventory = load_inventory_from_bytes(
+            upload.getvalue()
+        )
+
         data_label = upload.name
+
     else:
-        base_df = load_inventory_from_path(str(DEFAULT_FILE))
+        inventory = load_inventory_from_path(
+            str(DEFAULT_FILE)
+        )
+
         data_label = DEFAULT_FILE.name
+
 except Exception as exc:
-    st.error(f"Could not load inventory: {exc}")
+    st.error(
+        f"Could not load inventory: {exc}"
+    )
     st.stop()
 
-df = add_scenario_columns(base_df, target_floor, mall_floor)
 
-# Header
-st.markdown('<div class="eyebrow">VIBES / CONSIGNMENT INVENTORY</div>', unsafe_allow_html=True)
-st.markdown('<div class="portal-title">Prelegent Inventory Command Center</div>', unsafe_allow_html=True)
+# ============================================================
+# HEADER AND NAVIGATION
+# ============================================================
+
 st.markdown(
-    f'<div class="portal-sub">Board-level stock visibility + product/colour/size drill-down · Data: <b>{data_label}</b></div>',
+    '<div class="eyebrow">VIBES / PRELEGENT MALL</div>',
     unsafe_allow_html=True,
 )
 
-pages = st.tabs(["Board View", "Product Explorer", "Size Analytics", "Return Control", "Safe Send Planner", "SKU Data"])
+st.markdown(
+    """
+    <div class="portal-title">
+        Current Inventory Command Center
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
-# -----------------------------
-# 1. Board View
-# -----------------------------
-with pages[0]:
-    mall = df["Salable Stock"].sum()
-    wh = df["WI Stock"].sum()
-    physical = df["Current Physical"].sum()
-    wiout = df["WI Out Stock"].sum()
-    ret = df["Return Stock"].sum()
-    send = df["Safe Send"].sum()
-    move = df["Move WI → Mall"].sum()
-    blocked = int((df["Return Block"]).sum())
+st.markdown(
+    f"""
+    <div class="portal-sub">
+        Product, category, colour and size-level stock visibility
+        · Data: <b>{data_label}</b>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
-    c = st.columns(6)
-    with c[0]: kpi("Mall stock", fmt_int(mall), "Current salable units", "blue")
-    with c[1]: kpi("Warehouse", fmt_int(wh), "Current WI Stock", "purple")
-    with c[2]: kpi("Physical stock", fmt_int(physical), "Mall + Warehouse", "dark")
-    with c[3]: kpi("Return pool", fmt_int(ret), "Separated from active stock", "red")
-    with c[4]: kpi("Safe send", fmt_int(send), f"Target floor = {target_floor}", "green")
-    with c[5]: kpi("WI → Mall", fmt_int(move), f"Mall floor = {mall_floor}", "amber")
+tabs = st.tabs(
+    [
+        "Dashboard",
+        "Premium Search & Size Analysis",
+        "Category Stock",
+        "Return Analysis",
+        "SKU Data",
+    ]
+)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+
+# ============================================================
+# DASHBOARD
+# ============================================================
+
+with tabs[0]:
+    total_skus = inventory["SKU"].nunique()
+    total_products = inventory["Product"].nunique()
+    total_stock = inventory["Total Stock"].sum()
+
+    out_count = inventory.loc[
+        inventory["Total Stock"].eq(0),
+        "SKU",
+    ].nunique()
+
+    low_count = inventory.loc[
+        inventory["Total Stock"].between(1, 2),
+        "SKU",
+    ].nunique()
+
+    total_returns = inventory["Return Stock"].sum()
+    return_value = inventory["Return Value"].sum()
+
+    return_skus = inventory.loc[
+        inventory["Return Stock"].gt(0),
+        "SKU",
+    ].nunique()
+
+    return_products = inventory.loc[
+        inventory["Return Stock"].gt(0),
+        "Product",
+    ].nunique()
+
+    dashboard_cards = st.columns(6)
+
+    with dashboard_cards[0]:
+        kpi(
+            "SKU variants",
+            fmt_int(total_skus),
+            "Valid SKU rows",
+            "dark",
+        )
+
+    with dashboard_cards[1]:
+        kpi(
+            "Products",
+            fmt_int(total_products),
+            "Case-normalized styles",
+            "blue",
+        )
+
+    with dashboard_cards[2]:
+        kpi(
+            "Current stock",
+            fmt_int(total_stock),
+            "Based on Total Stock",
+            "teal",
+        )
+
+    with dashboard_cards[3]:
+        kpi(
+            "Return stock",
+            fmt_int(total_returns),
+            "Tracked separately",
+            "red",
+        )
+
+    with dashboard_cards[4]:
+        kpi(
+            "Low stock",
+            fmt_int(low_count),
+            "Variants with 1–2 units",
+            "amber",
+        )
+
+    with dashboard_cards[5]:
+        kpi(
+            "Out of stock",
+            fmt_int(out_count),
+            "Zero-total-stock variants",
+            "red",
+        )
+
     st.markdown(
-        f'<div class="notice"><strong>Control check:</strong> WI Out Stock = <b>{fmt_int(wiout)}</b> units and stays separate from current physical inventory. '
-        f'<b>{blocked:,}</b> variant rows are currently blocked from replenishment because they are return-marked or not eligible.</div>',
+        "<br>",
         unsafe_allow_html=True,
     )
 
-    cat = df.groupby("Category", as_index=False).agg(
-        Mall=("Salable Stock","sum"), Warehouse=("WI Stock","sum"), Return=("Return Stock","sum"),
-        Safe_Send=("Safe Send","sum"), Move_to_Mall=("Move WI → Mall","sum"),
-        Retail_Value=("Mall Retail Value","sum")
+    st.markdown(
+        """
+        <div class="notice">
+            <strong>Clean inventory view:</strong>
+            duplicate capitalization is grouped, size labels such as
+            XXL/2XL and XXXL/3XL are normalized, and the source Total
+            row is excluded from calculations.
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-    cat["Physical"] = cat["Mall"] + cat["Warehouse"]
-    cat = cat.sort_values("Physical", ascending=False)
 
-    left, right = st.columns([1.25, 1])
+    st.markdown(
+        """
+        <div class="section-title">
+            Return Control Snapshot
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    return_cards = st.columns(4)
+
+    with return_cards[0]:
+        kpi(
+            "Return units",
+            fmt_int(total_returns),
+            "Marked Return Stock",
+            "red",
+        )
+
+    with return_cards[1]:
+        kpi(
+            "Return value",
+            fmt_money(return_value),
+            "At listed price",
+            "red",
+        )
+
+    with return_cards[2]:
+        kpi(
+            "Affected SKUs",
+            fmt_int(return_skus),
+            "Variants with returns",
+            "amber",
+        )
+
+    with return_cards[3]:
+        kpi(
+            "Affected products",
+            fmt_int(return_products),
+            "Product styles",
+            "purple",
+        )
+
+    st.markdown(
+        f"""
+        <div class="return-banner">
+            <strong>Return visibility:</strong>
+            {fmt_int(total_returns)} return units across
+            {fmt_int(return_skus)} SKU variants are tracked
+            separately and can be inspected in the dedicated
+            Return Analysis page.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    by_category = (
+        inventory.groupby(
+            "Category",
+            as_index=False,
+        )
+        .agg(
+            **{
+                "Total Stock": (
+                    "Total Stock",
+                    "sum",
+                ),
+                "Returns": (
+                    "Return Stock",
+                    "sum",
+                ),
+                "Products": (
+                    "Product",
+                    "nunique",
+                ),
+                "Variants": (
+                    "SKU",
+                    "nunique",
+                ),
+            }
+        )
+        .sort_values(
+            "Total Stock",
+            ascending=False,
+        )
+    )
+
+    top_products = (
+        inventory.groupby(
+            ["Category", "Product"],
+            as_index=False,
+        )["Total Stock"]
+        .sum()
+        .sort_values(
+            "Total Stock",
+            ascending=False,
+        )
+        .head(12)
+    )
+
+    top_products["Label"] = (
+        top_products["Product"]
+        + " · "
+        + top_products["Category"]
+    )
+
+    left, right = st.columns([1.2, 1])
+
     with left:
-        melt = cat.melt(id_vars="Category", value_vars=["Mall","Warehouse","Return"], var_name="Stock Type", value_name="Units")
-        fig = px.bar(melt, x="Category", y="Units", color="Stock Type", barmode="stack", text_auto=True,
-                     color_discrete_map={"Mall":"#175CD3","Warehouse":"#7F56D9","Return":"#D92D20"})
-        fig.update_layout(title="Inventory Position by Category", template="plotly_white", height=430, margin=dict(l=20,r=20,t=55,b=80), legend_title_text="")
-        fig.update_xaxes(tickangle=-35)
-        st.plotly_chart(fig, use_container_width=True)
-    with right:
-        act = cat[["Category","Safe_Send","Move_to_Mall","Return"]].melt(id_vars="Category", var_name="Decision", value_name="Units")
-        act = act[act["Units"] > 0]
-        fig2 = px.bar(act, x="Units", y="Category", color="Decision", orientation="h", text_auto=True,
-                      color_discrete_map={"Safe_Send":"#12B76A","Move_to_Mall":"#F79009","Return":"#F04438"})
-        fig2.update_layout(title="Board Action Quantities", template="plotly_white", height=430, margin=dict(l=20,r=20,t=55,b=25), legend_title_text="")
-        st.plotly_chart(fig2, use_container_width=True)
+        category_figure = bar_chart(
+            by_category,
+            "Category",
+            "Total Stock",
+            "Current Stock by Category (Total Stock)",
+        )
 
-    st.markdown('<div class="section-title">Board Decision Table</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-sub">Return is exact from source. Send is scenario-based and excludes return-marked variants.</div>', unsafe_allow_html=True)
-    decision = cat.rename(columns={"Safe_Send":"Safe Send", "Move_to_Mall":"Move WI → Mall", "Retail_Value":"Mall Retail Value"})
-    decision["Net VIBES Movement"] = decision["Safe Send"] - decision["Return"]
-    st.dataframe(
-        decision[["Category","Mall","Warehouse","Physical","Return","Move WI → Mall","Safe Send","Net VIBES Movement","Mall Retail Value"]],
-        use_container_width=True, hide_index=True,
-        column_config={"Mall Retail Value": st.column_config.NumberColumn(format="৳%d")}
+        if category_figure is not None:
+            category_figure.update_xaxes(
+                tickangle=-30
+            )
+
+            st.plotly_chart(
+                category_figure,
+                width="stretch",
+            )
+
+    with right:
+        st.plotly_chart(
+            stock_status_chart(inventory),
+            width="stretch",
+        )
+
+    left, right = st.columns([1.2, 1])
+
+    with left:
+        st.plotly_chart(
+            bar_chart(
+                top_products.sort_values(
+                    "Total Stock"
+                ),
+                "Label",
+                "Total Stock",
+                "Top Products by Current Stock",
+                orientation="h",
+            ),
+            width="stretch",
+        )
+
+    with right:
+        st.plotly_chart(
+            bar_chart(
+                size_summary(inventory),
+                "Size",
+                "Total Stock",
+                "Current Stock by Size",
+            ),
+            width="stretch",
+        )
+
+    st.markdown(
+        """
+        <div class="section-title">
+            Category Inventory Summary
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-    top_return = cat.sort_values("Return", ascending=False).iloc[0]
-    top_send = cat.sort_values("Safe_Send", ascending=False).iloc[0]
-    top_move = cat.sort_values("Move_to_Mall", ascending=False).iloc[0]
-    st.markdown('<div class="section-title">Simple Board Story</div>', unsafe_allow_html=True)
-    a,b,c3 = st.columns(3)
-    with a:
-        st.markdown(f'<div class="danger-box"><b>1 · Return first</b><br>{top_return.Category}: {fmt_int(top_return.Return)} units marked to come back. These variants are automatically blocked from new-send recommendations.</div>', unsafe_allow_html=True)
-    with b:
-        st.markdown(f'<div class="success-box"><b>2 · Replenish selectively</b><br>{top_send.Category}: up to {fmt_int(top_send.Safe_Send)} safe-send units under the current target-floor scenario.</div>', unsafe_allow_html=True)
-    with c3:
-        st.markdown(f'<div class="notice"><b>3 · Use their warehouse first</b><br>{top_move.Category}: {fmt_int(top_move.Move_to_Mall)} units can potentially move from WI Stock to mall before VIBES sends more.</div>', unsafe_allow_html=True)
-
-# -----------------------------
-# 2. Product Explorer
-# -----------------------------
-with pages[1]:
-    st.markdown('<div class="section-title">Product / Variant Explorer</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-sub">Filter a product or full category, then inspect the exact SKU, size, colour and action.</div>', unsafe_allow_html=True)
-
-    fc1, fc2 = st.columns([1,2])
-    categories = ["All Categories"] + sorted(df["Category"].dropna().unique().tolist())
-    with fc1:
-        selected_cat = st.selectbox("Category", categories, key="prod_cat")
-    sub = df if selected_cat == "All Categories" else df[df["Category"] == selected_cat]
-    
-    products = ["All Products / Styles"] + sorted(sub["Normalized Product"].dropna().unique().tolist())
-    with fc2:
-        selected_product = st.selectbox("Product / Style", products, key="prod_style")
-
-    prod = sub if selected_product == "All Products / Styles" else sub[sub["Normalized Product"] == selected_product].copy()
-    
-    mall = prod["Salable Stock"].sum(); wh = prod["WI Stock"].sum(); ret = prod["Return Stock"].sum(); send = prod["Safe Send"].sum(); move = prod["Move WI → Mall"].sum()
-    kc = st.columns(5)
-    with kc[0]: kpi("Mall", fmt_int(mall), "Salable", "blue")
-    with kc[1]: kpi("Warehouse", fmt_int(wh), "WI Stock", "purple")
-    with kc[2]: kpi("Return", fmt_int(ret), "Do not resend", "red")
-    with kc[3]: kpi("Safe Send", fmt_int(send), "After exclusions", "green")
-    with kc[4]: kpi("Move WI → Mall", fmt_int(move), "Use before sending", "amber")
-
-    matrix_tabs = st.tabs(["Current Physical", "Mall", "Warehouse", "Return", "Safe Send"])
-    matrix_specs = [
-        ("Current Physical","blue"), ("Salable Stock","green"), ("WI Stock","purple"), ("Return Stock","red"), ("Safe Send","green")
-    ]
-    for tab, (metric,tone) in zip(matrix_tabs, matrix_specs):
-        with tab:
-            p = pivot_matrix(prod, metric)
-            if p.empty:
-                st.info("No data for this product/category selection.")
-            else:
-                l,r = st.columns([1.2,1])
-                with l:
-                    title_context = f"{selected_cat} (All Products)" if selected_product == "All Products / Styles" else selected_product
-                    st.markdown(f"**Colour × Size Matrix — {metric} ({title_context})**")
-                    st.dataframe(matrix_styler(p, tone), use_container_width=True)
-                with r:
-                    fig = heatmap_matrix(p, f"{title_context} · {metric}")
-                    if fig: st.plotly_chart(fig, use_container_width=True)
-
-    st.markdown('<div class="section-title">Variant Inspector</div>', unsafe_allow_html=True)
-    variant_cols = ["SKU","Color","Size","Salable Stock","WI Stock","Current Physical","Return Stock","Move WI → Mall","Safe Send","Action"]
-    variants = prod[variant_cols].copy().sort_values(["Color","Size"])
-    event = st.dataframe(
-        variants,
-        use_container_width=True,
+    st.dataframe(
+        by_category,
+        width="stretch",
         hide_index=True,
-        on_select="rerun",
-        selection_mode="single-row",
-        key="variant_grid",
+    )
+
+
+# ============================================================
+# PREMIUM SEARCH AND SIZE ANALYSIS
+# ============================================================
+
+with tabs[1]:
+    st.markdown(
+        """
+        <div class="section-title">
+            Premium Product Search & Size Analysis
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+        <div class="section-sub">
+            Use the filters once. Every result, KPI, size chart,
+            stock matrix and return analysis below automatically
+            follows these filters.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    # --------------------------------------------------------
+    # ONLY FILTER AREA ON THIS PAGE
+    # --------------------------------------------------------
+
+    query = st.text_input(
+        "Search product / SKU / colour / size",
+        placeholder=(
+            "Example: Classic Polo, VB-PR-CP, Black, 2XL"
+        ),
+    )
+
+    f1, f2, f3, f4, f5 = st.columns(
+        [1, 1.3, 1, 1, 1.1]
+    )
+
+    with f1:
+        selected_categories = st.multiselect(
+            "Category",
+            sorted(
+                inventory["Category"].unique()
+            ),
+            placeholder="All categories",
+        )
+
+    if selected_categories:
+        product_pool = inventory[
+            inventory["Category"].isin(
+                selected_categories
+            )
+        ]
+    else:
+        product_pool = inventory
+
+    with f2:
+        selected_products = st.multiselect(
+            "Product",
+            sorted(
+                product_pool["Product"].unique()
+            ),
+            placeholder="All products",
+        )
+
+    with f3:
+        selected_sizes = st.multiselect(
+            "Size",
+            order_sizes(product_pool["Size"]),
+            placeholder="All sizes",
+        )
+
+    with f4:
+        selected_colors = st.multiselect(
+            "Colour",
+            sorted(
+                product_pool["Color"].unique()
+            ),
+            placeholder="All colours",
+        )
+
+    with f5:
+        selected_stock = st.multiselect(
+            "Stock status",
+            [
+                "Healthy (3+)",
+                "Low Stock (1-2)",
+                "Out of Stock",
+            ],
+            placeholder="All stock",
+        )
+
+    filtered = filter_inventory(
+        inventory,
+        search_text=query,
+        categories=selected_categories,
+        products=selected_products,
+        sizes=selected_sizes,
+        colors=selected_colors,
+        stock_states=selected_stock,
+    )
+
+    st.markdown(
+        f"""
+        <div class="filter-summary">
+            <b>{len(filtered):,}</b> matching SKU rows ·
+            <b>{filtered["Product"].nunique():,}</b> products ·
+            <b>{fmt_int(filtered["Total Stock"].sum())}</b>
+            current units from Total Stock
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if filtered.empty:
+        st.warning(
+            "No products match the selected filters."
+        )
+
+    else:
+        # All sections below use the same filtered DataFrame.
+        product_data = filtered.copy()
+
+        matching_products = sorted(
+            product_data[
+                "Product"
+            ].dropna().unique()
+        )
+
+        if len(matching_products) == 1:
+            analysis_title = matching_products[0]
+
+        elif selected_products:
+            analysis_title = (
+                f"{len(matching_products)} "
+                "Selected Products"
+            )
+
+        elif query.strip():
+            analysis_title = (
+                f'Search Results for “{query.strip()}”'
+            )
+
+        else:
+            analysis_title = "All Filtered Products"
+
+        # ----------------------------------------------------
+        # FILTERED KPI SUMMARY
+        # ----------------------------------------------------
+
+        search_cards = st.columns(6)
+
+        with search_cards[0]:
+            kpi(
+                "Matches",
+                fmt_int(len(product_data)),
+                "SKU rows",
+                "dark",
+            )
+
+        with search_cards[1]:
+            kpi(
+                "Products",
+                fmt_int(
+                    product_data[
+                        "Product"
+                    ].nunique()
+                ),
+                "Matching styles",
+                "blue",
+            )
+
+        with search_cards[2]:
+            kpi(
+                "Sizes",
+                fmt_int(
+                    product_data[
+                        "Size"
+                    ].nunique()
+                ),
+                "Normalized sizes",
+                "purple",
+            )
+
+        with search_cards[3]:
+            kpi(
+                "Current stock",
+                fmt_int(
+                    product_data[
+                        "Total Stock"
+                    ].sum()
+                ),
+                "Based on Total Stock",
+                "teal",
+            )
+
+        with search_cards[4]:
+            kpi(
+                "Returns",
+                fmt_int(
+                    product_data[
+                        "Return Stock"
+                    ].sum()
+                ),
+                "Return units",
+                "red",
+            )
+
+        with search_cards[5]:
+            kpi(
+                "Stock value",
+                fmt_money(
+                    product_data[
+                        "Stock Value"
+                    ].sum()
+                ),
+                "Total Stock × Price",
+                "amber",
+            )
+
+        # ----------------------------------------------------
+        # FILTERED PRODUCT RESULTS
+        # ----------------------------------------------------
+
+        st.markdown(
+            """
+            <div class="section-title">
+                Filtered Product Results
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        result_columns = [
+            "Category",
+            "Product",
+            "SKU",
+            "Size",
+            "Color",
+            "Price",
+            "Total Stock",
+            "Return Stock",
+            "Stock Status",
+            "Brand",
+        ]
+
+        result = (
+            product_data
+            .sort_values(
+                [
+                    "Product",
+                    "Size Rank",
+                    "Color",
+                ]
+            )
+            [result_columns]
+        )
+
+        st.dataframe(
+            result,
+            width="stretch",
+            hide_index=True,
+            height=560,
+            column_config={
+                "Price": (
+                    st.column_config.NumberColumn(
+                        format="৳%d"
+                    )
+                ),
+                "Total Stock": (
+                    st.column_config.NumberColumn(
+                        format="%d"
+                    )
+                ),
+                "Return Stock": (
+                    st.column_config.NumberColumn(
+                        format="%d"
+                    )
+                ),
+            },
+        )
+
+        st.download_button(
+            "Download filtered inventory (CSV)",
+            result.to_csv(
+                index=False
+            ).encode("utf-8-sig"),
+            "Vibes_Filtered_Inventory.csv",
+            "text/csv",
+        )
+
+        # ----------------------------------------------------
+        # PRODUCT AND SIZE ANALYSIS
+        # NO SECOND FILTER OR PRODUCT SELECTOR
+        # ----------------------------------------------------
+
+        st.markdown(
+            """
+            <div class="section-title">
+                Product & Size Analysis
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            """
+            <div class="section-sub">
+                This section uses exactly the same filtered
+                results shown above. There is no separate
+                product or size filter.
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f"""
+            <div class="filter-summary">
+                Analysing <b>{analysis_title}</b> ·
+                <b>{len(product_data):,}</b> SKU rows ·
+                <b>{len(matching_products):,}</b> products ·
+                <b>{fmt_int(product_data["Total Stock"].sum())}</b>
+                current units
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        analysis_cards = st.columns(6)
+
+        with analysis_cards[0]:
+            kpi(
+                "Products",
+                fmt_int(
+                    product_data[
+                        "Product"
+                    ].nunique()
+                ),
+                "Filtered products",
+                "blue",
+            )
+
+        with analysis_cards[1]:
+            kpi(
+                "Current stock",
+                fmt_int(
+                    product_data[
+                        "Total Stock"
+                    ].sum()
+                ),
+                "Based on Total Stock",
+                "teal",
+            )
+
+        with analysis_cards[2]:
+            kpi(
+                "Sizes",
+                fmt_int(
+                    product_data[
+                        "Size"
+                    ].nunique()
+                ),
+                "Normalized sizes",
+                "purple",
+            )
+
+        with analysis_cards[3]:
+            kpi(
+                "Colours",
+                fmt_int(
+                    product_data[
+                        "Color"
+                    ].nunique()
+                ),
+                "Filtered colours",
+                "dark",
+            )
+
+        with analysis_cards[4]:
+            kpi(
+                "Returns",
+                fmt_int(
+                    product_data[
+                        "Return Stock"
+                    ].sum()
+                ),
+                "Return units",
+                "red",
+            )
+
+        with analysis_cards[5]:
+            kpi(
+                "Out of stock",
+                fmt_int(
+                    product_data[
+                        "Total Stock"
+                    ].eq(0).sum()
+                ),
+                "Zero-stock variants",
+                "red",
+            )
+
+        # ----------------------------------------------------
+        # SIZE ANALYSIS AND COLOUR-SIZE MATRIX
+        # ----------------------------------------------------
+
+        size_data = size_summary(product_data)
+
+        stock_matrix = color_size_matrix(
+            product_data
+        )
+
+        left, right = st.columns([1, 1.25])
+
+        with left:
+            size_figure = bar_chart(
+                size_data,
+                "Size",
+                "Total Stock",
+                (
+                    f"{analysis_title} · "
+                    "Current Stock by Size"
+                ),
+            )
+
+            if size_figure is not None:
+                st.plotly_chart(
+                    size_figure,
+                    width="stretch",
+                )
+
+            st.dataframe(
+                size_data,
+                width="stretch",
+                hide_index=True,
+                column_config={
+                    "Total Stock": (
+                        st.column_config.NumberColumn(
+                            format="%d"
+                        )
+                    ),
+                    "Returns": (
+                        st.column_config.NumberColumn(
+                            format="%d"
+                        )
+                    ),
+                    "Variants": (
+                        st.column_config.NumberColumn(
+                            format="%d"
+                        )
+                    ),
+                    "Out of Stock": (
+                        st.column_config.NumberColumn(
+                            format="%d"
+                        )
+                    ),
+                },
+            )
+
+        with right:
+            st.markdown(
+                f"**Colour × Size Matrix — "
+                f"{analysis_title}**"
+            )
+
+            st.dataframe(
+                matrix_style(stock_matrix),
+                width="stretch",
+            )
+
+            heatmap_body = (
+                stock_matrix
+                .drop(
+                    index="TOTAL",
+                    errors="ignore",
+                )
+                .drop(
+                    columns="Total",
+                    errors="ignore",
+                )
+            )
+
+            if not heatmap_body.empty:
+                heatmap = go.Figure(
+                    go.Heatmap(
+                        z=heatmap_body.values,
+                        x=list(
+                            heatmap_body.columns
+                        ),
+                        y=list(
+                            heatmap_body.index
+                        ),
+                        text=heatmap_body.values,
+                        texttemplate="%{text}",
+                        colorscale=[
+                            [0, "#F8FAFC"],
+                            [.45, "#9FD8D1"],
+                            [1, "#146B63"],
+                        ],
+                        hovertemplate=(
+                            "Colour: %{y}<br>"
+                            "Size: %{x}<br>"
+                            "Total Stock: %{z}"
+                            "<extra></extra>"
+                        ),
+                    )
+                )
+
+                heatmap.update_layout(
+                    title=(
+                        f"{analysis_title} · "
+                        "Colour and Size Stock"
+                    ),
+                    template="plotly_white",
+                    height=max(
+                        350,
+                        42 * len(
+                            heatmap_body
+                        ) + 130,
+                    ),
+                    margin=dict(
+                        l=20,
+                        r=20,
+                        t=55,
+                        b=30,
+                    ),
+                )
+
+                st.plotly_chart(
+                    heatmap,
+                    width="stretch",
+                )
+
+        # ----------------------------------------------------
+        # PRODUCT × SIZE MATRIX
+        # ----------------------------------------------------
+
+        st.markdown(
+            "**Filtered Product × Size Stock**"
+        )
+
+        filtered_product_matrix = (
+            product_size_matrix(
+                product_data
+            )
+        )
+
+        st.dataframe(
+            matrix_style(
+                filtered_product_matrix
+            ),
+            width="stretch",
+            height=min(
+                650,
+                max(
+                    250,
+                    75
+                    + len(
+                        filtered_product_matrix
+                    ) * 36,
+                ),
+            ),
+        )
+
+        # ----------------------------------------------------
+        # FILTERED RETURN MATRIX
+        # ----------------------------------------------------
+
+        if (
+            product_data[
+                "Return Stock"
+            ].sum() > 0
+        ):
+            st.markdown(
+                "**Filtered Return Stock — "
+                "Colour × Size**"
+            )
+
+            filtered_return_matrix = (
+                color_size_matrix(
+                    product_data,
+                    "Return Stock",
+                )
+            )
+
+            st.dataframe(
+                matrix_style(
+                    filtered_return_matrix
+                ),
+                width="stretch",
+            )
+
+        # ----------------------------------------------------
+        # COMPLETE FILTERED VARIANTS
+        # ----------------------------------------------------
+
+        st.markdown(
+            "**Complete filtered product variants**"
+        )
+
+        variant_columns = [
+            "Category",
+            "Product",
+            "SKU",
+            "Size",
+            "Color",
+            "Price",
+            "Total Stock",
+            "Return Stock",
+            "Return Value",
+            "Stock Status",
+            "Return Status",
+        ]
+
+        variant_data = (
+            product_data
+            .sort_values(
+                [
+                    "Product",
+                    "Size Rank",
+                    "Color",
+                ]
+            )
+            [variant_columns]
+        )
+
+        st.dataframe(
+            variant_data,
+            width="stretch",
+            hide_index=True,
+            height=480,
+            column_config={
+                "Price": (
+                    st.column_config.NumberColumn(
+                        format="৳%d"
+                    )
+                ),
+                "Total Stock": (
+                    st.column_config.NumberColumn(
+                        format="%d"
+                    )
+                ),
+                "Return Stock": (
+                    st.column_config.NumberColumn(
+                        format="%d"
+                    )
+                ),
+                "Return Value": (
+                    st.column_config.NumberColumn(
+                        format="৳%d"
+                    )
+                ),
+            },
+        )
+
+
+# ============================================================
+# CATEGORY STOCK
+# ============================================================
+
+with tabs[2]:
+    st.markdown(
+        """
+        <div class="section-title">
+            Category & Product Stock
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+        <div class="section-sub">
+            Compare every category and product across all
+            normalized sizes.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    selected_category = st.selectbox(
+        "Filter category",
+        [
+            "All Categories",
+            *sorted(
+                inventory[
+                    "Category"
+                ].unique()
+            ),
+        ],
+        key="category_table",
+    )
+
+    if selected_category == "All Categories":
+        category_data = inventory
+    else:
+        category_data = inventory[
+            inventory["Category"].eq(
+                selected_category
+            )
+        ]
+
+    category_matrix = product_size_matrix(
+        category_data
+    )
+
+    st.dataframe(
+        matrix_style(category_matrix),
+        width="stretch",
+        height=650,
+    )
+
+    product_totals = (
+        category_data.groupby(
+            ["Category", "Product"],
+            as_index=False,
+        )
+        .agg(
+            **{
+                "Total Stock": (
+                    "Total Stock",
+                    "sum",
+                ),
+                "Returns": (
+                    "Return Stock",
+                    "sum",
+                ),
+                "Return_Value": (
+                    "Return Value",
+                    "sum",
+                ),
+                "Variants": (
+                    "SKU",
+                    "nunique",
+                ),
+                "Sizes": (
+                    "Size",
+                    "nunique",
+                ),
+            }
+        )
+        .sort_values(
+            "Total Stock",
+            ascending=False,
+        )
+    )
+
+    st.dataframe(
+        product_totals,
+        width="stretch",
+        hide_index=True,
         column_config={
-            "Action": st.column_config.TextColumn(width="large"),
-            "Safe Send": st.column_config.NumberColumn(help="Automatically 0 if variant is in Return Stock."),
+            "Return_Value": (
+                st.column_config.NumberColumn(
+                    "Return Value",
+                    format="৳%d",
+                )
+            )
         },
     )
-    selected_rows = event.selection.rows if hasattr(event, "selection") else []
-    if selected_rows:
-        row = variants.iloc[selected_rows[0]]
-        st.markdown("---")
-        d1,d2,d3,d4,d5,d6 = st.columns(6)
-        with d1: kpi("SKU", str(row["SKU"]), "Selected variant", "dark")
-        with d2: kpi("Colour", str(row["Color"]), "", "blue")
-        with d3: kpi("Size", str(row["Size"]), "", "purple")
-        with d4: kpi("Current", fmt_int(row["Current Physical"]), "Mall + WI", "dark")
-        with d5: kpi("Return", fmt_int(row["Return Stock"]), "Blocked if > 0", "red")
-        with d6: kpi("Safe Send", fmt_int(row["Safe Send"]), str(row["Action"]), "green" if row["Safe Send"] else "amber")
-        if row["Return Stock"] > 0:
-            st.markdown('<div class="danger-box"><b>RETURN LOCK:</b> This exact SKU / colour / size is in the return pool, so the portal will not recommend sending it again.</div>', unsafe_allow_html=True)
 
-# -----------------------------
-# 3. Size Analytics
-# -----------------------------
-with pages[2]:
-    st.markdown('<div class="section-title">Size Analytics</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-sub">See where stock is concentrated and which sizes are missing across any category or product.</div>', unsafe_allow_html=True)
-    sc1,sc2,sc3 = st.columns([1,1.4,1])
-    with sc1:
-        size_cat = st.selectbox("Category", ["All Categories"] + sorted(df["Category"].unique().tolist()), key="size_cat")
-    sdf = df if size_cat == "All Categories" else df[df["Category"] == size_cat]
-    with sc2:
-        size_products = ["All Products"] + sorted(sdf["Normalized Product"].unique().tolist())
-        size_prod = st.selectbox("Product", size_products, key="size_prod")
-    if size_prod != "All Products": sdf = sdf[sdf["Normalized Product"] == size_prod]
-    with sc3:
-        size_metric = st.selectbox("Metric", ["Current Physical","Salable Stock","WI Stock","Return Stock","Safe Send"], key="size_metric")
-
-    l,r = st.columns([1.1,1])
-    with l:
-        fig = plot_size_chart(sdf, size_metric, f"{size_metric} by Size")
-        if fig: st.plotly_chart(fig, use_container_width=True)
-    with r:
-        p = pivot_matrix(sdf, size_metric)
-        fig = heatmap_matrix(p, f"Colour × Size · {size_metric}")
-        if fig: st.plotly_chart(fig, use_container_width=True)
-
-    size_summary = sdf.groupby("Size", as_index=False).agg(
-        Mall=("Salable Stock","sum"), Warehouse=("WI Stock","sum"), Current=("Current Physical","sum"),
-        Return=("Return Stock","sum"), Safe_Send=("Safe Send","sum")
+    category_product_figure = bar_chart(
+        product_totals
+        .head(20)
+        .sort_values("Total Stock"),
+        "Product",
+        "Total Stock",
+        "Top Products in Selected Category",
+        orientation="h",
     )
-    order = order_sizes(size_summary["Size"])
-    size_summary["_o"] = size_summary["Size"].map({s:i for i,s in enumerate(order)})
-    size_summary = size_summary.sort_values("_o").drop(columns="_o")
-    st.dataframe(size_summary, use_container_width=True, hide_index=True)
 
-# -----------------------------
-# 4. Return Control
-# -----------------------------
-with pages[3]:
-    returns = df[df["Return Stock"] > 0].copy()
-    st.markdown('<div class="section-title">Return Control Center</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-sub">Returned inventory is isolated here and automatically blocked from replenishment.</div>', unsafe_allow_html=True)
-    c = st.columns(4)
-    with c[0]: kpi("Return units", fmt_int(returns["Return Stock"].sum()), "Exact source quantity", "red")
-    with c[1]: kpi("Return value", fmt_money(returns["Return Value"].sum()), "At listed price", "red")
-    with c[2]: kpi("Return products", fmt_int(returns["Normalized Product"].nunique()), "Styles affected", "purple")
-    with c[3]: kpi("Blocked variants", fmt_int(len(returns)), "Safe Send forced to zero", "dark")
+    if category_product_figure is not None:
+        st.plotly_chart(
+            category_product_figure,
+            width="stretch",
+        )
+
+
+# ============================================================
+# RETURN ANALYSIS
+# ============================================================
+
+with tabs[3]:
+    st.markdown(
+        """
+        <div class="section-title">
+            Premium Return Analysis
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+        <div class="section-sub">
+            Isolate every return-marked unit by category,
+            product, colour, size and SKU.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    returns = inventory[
+        inventory["Return Stock"].gt(0)
+    ].copy()
+
+    return_cards = st.columns(5)
+
+    with return_cards[0]:
+        kpi(
+            "Return units",
+            fmt_int(
+                returns[
+                    "Return Stock"
+                ].sum()
+            ),
+            "Exact return quantity",
+            "red",
+        )
+
+    with return_cards[1]:
+        kpi(
+            "Return value",
+            fmt_money(
+                returns[
+                    "Return Value"
+                ].sum()
+            ),
+            "At listed price",
+            "red",
+        )
+
+    with return_cards[2]:
+        kpi(
+            "Affected SKUs",
+            fmt_int(
+                returns[
+                    "SKU"
+                ].nunique()
+            ),
+            "Return variants",
+            "amber",
+        )
+
+    with return_cards[3]:
+        kpi(
+            "Products",
+            fmt_int(
+                returns[
+                    "Product"
+                ].nunique()
+            ),
+            "Affected styles",
+            "purple",
+        )
+
+    with return_cards[4]:
+        kpi(
+            "Categories",
+            fmt_int(
+                returns[
+                    "Category"
+                ].nunique()
+            ),
+            "Affected groups",
+            "dark",
+        )
 
     if returns.empty:
-        st.success("No return stock is currently marked.")
+        st.success(
+            "No return stock is currently "
+            "marked in this workbook."
+        )
+
+        st.plotly_chart(
+            return_status_chart(inventory),
+            width="stretch",
+        )
+
     else:
-        rc1, rc2 = st.columns([1,1])
-        bycat = returns.groupby("Category", as_index=False)["Return Stock"].sum().sort_values("Return Stock", ascending=False)
-        byprod = returns.groupby(["Category","Normalized Product"], as_index=False)["Return Stock"].sum().sort_values("Return Stock", ascending=False)
-        with rc1:
-            fig = plot_bar(bycat, "Category", "Return Stock", "Return Units by Category", orientation="h")
-            if fig: st.plotly_chart(fig, use_container_width=True)
-        with rc2:
-            top = byprod.head(15).copy()
-            top["Label"] = top["Normalized Product"] + " · " + top["Category"]
-            fig = plot_bar(top, "Label", "Return Stock", "Top Return Products", orientation="h")
-            if fig: st.plotly_chart(fig, use_container_width=True)
+        rf1, rf2, rf3 = st.columns(
+            [1, 1.4, 1]
+        )
 
-        rcat = st.selectbox("Inspect return category", sorted(returns["Category"].unique().tolist()), key="ret_cat")
-        rsub = returns[returns["Category"] == rcat]
-        rprod = st.selectbox("Inspect return product", sorted(rsub["Normalized Product"].unique().tolist()), key="ret_prod")
-        rp = rsub[rsub["Normalized Product"] == rprod]
-        p = pivot_matrix(rp, "Return Stock")
-        l,r = st.columns([1.2,1])
-        with l: st.dataframe(matrix_styler(p, "red"), use_container_width=True)
-        with r:
-            fig = heatmap_matrix(p, f"Return Matrix · {rprod}")
-            if fig: st.plotly_chart(fig, use_container_width=True)
+        with rf1:
+            return_categories = st.multiselect(
+                "Return category",
+                sorted(
+                    returns[
+                        "Category"
+                    ].unique()
+                ),
+                placeholder="All categories",
+            )
 
-        ret_export = returns[["Category","Normalized Product","SKU","Color","Size","Return Stock","Return Value","Action"]]
-        st.download_button("Download Return List (CSV)", ret_export.to_csv(index=False).encode("utf-8-sig"), "Prelegent_Return_List.csv", "text/csv")
+        if return_categories:
+            return_pool = returns[
+                returns["Category"].isin(
+                    return_categories
+                )
+            ]
+        else:
+            return_pool = returns
 
-# -----------------------------
-# 5. Safe Send Planner
-# -----------------------------
-with pages[4]:
-    st.markdown('<div class="section-title">Safe Send Planner</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-sub">A conservative send plan: returned variants are excluded, and existing Prelegent warehouse stock is considered first.</div>', unsafe_allow_html=True)
+        with rf2:
+            return_products = st.multiselect(
+                "Return product",
+                sorted(
+                    return_pool[
+                        "Product"
+                    ].unique()
+                ),
+                placeholder="All products",
+            )
 
-    plan = df[(df["Safe Send"] > 0) | (df["Move WI → Mall"] > 0) | (df["Return Stock"] > 0)].copy()
-    pc = st.columns(4)
-    with pc[0]: kpi("Send from VIBES", fmt_int(df["Safe Send"].sum()), f"Target total = {target_floor}", "green")
-    with pc[1]: kpi("Move WI → Mall", fmt_int(df["Move WI → Mall"].sum()), f"Target mall = {mall_floor}", "amber")
-    with pc[2]: kpi("Return to VIBES", fmt_int(df["Return Stock"].sum()), "Marked source stock", "red")
-    with pc[3]: kpi("Net external units", fmt_int(df["Safe Send"].sum()-df["Return Stock"].sum()), "Send minus return", "dark")
+        with rf3:
+            return_sizes = st.multiselect(
+                "Return size",
+                order_sizes(
+                    return_pool["Size"]
+                ),
+                placeholder="All sizes",
+            )
 
-    st.markdown('<div class="success-box"><b>Protection rule:</b> if Return Stock &gt; 0 for a variant, Safe Send is always 0 for that variant — even if its mall stock is empty.</div>', unsafe_allow_html=True)
+        return_view = filter_inventory(
+            return_pool,
+            products=return_products,
+            sizes=return_sizes,
+        )
 
-    bycat = df.groupby("Category", as_index=False).agg(
-        Mall=("Salable Stock","sum"), Warehouse=("WI Stock","sum"), Move_WI_to_Mall=("Move WI → Mall","sum"),
-        Safe_Send=("Safe Send","sum"), Return=("Return Stock","sum")
+        left, right = st.columns([1.2, 1])
+
+        return_by_product = (
+            return_view.groupby(
+                ["Category", "Product"],
+                as_index=False,
+            )
+            .agg(
+                Returns=(
+                    "Return Stock",
+                    "sum",
+                ),
+                Return_Value=(
+                    "Return Value",
+                    "sum",
+                ),
+                SKUs=(
+                    "SKU",
+                    "nunique",
+                ),
+            )
+            .sort_values(
+                "Returns",
+                ascending=False,
+            )
+        )
+
+        return_by_product["Label"] = (
+            return_by_product["Product"]
+            + " · "
+            + return_by_product["Category"]
+        )
+
+        with left:
+            return_figure = bar_chart(
+                return_by_product
+                .head(20)
+                .sort_values("Returns"),
+                "Label",
+                "Returns",
+                "Return Units by Product",
+                orientation="h",
+            )
+
+            if return_figure is not None:
+                return_figure.update_traces(
+                    marker_color="#E05252"
+                )
+
+                st.plotly_chart(
+                    return_figure,
+                    width="stretch",
+                )
+
+        with right:
+            st.plotly_chart(
+                return_status_chart(inventory),
+                width="stretch",
+            )
+
+        st.markdown(
+            "**Return Colour × Size Matrix**"
+        )
+
+        st.dataframe(
+            matrix_style(
+                color_size_matrix(
+                    return_view,
+                    "Return Stock",
+                )
+            ),
+            width="stretch",
+        )
+
+        return_columns = [
+            "Category",
+            "Product",
+            "SKU",
+            "Size",
+            "Color",
+            "Price",
+            "Total Stock",
+            "Return Stock",
+            "Return Value",
+            "Brand",
+        ]
+
+        return_export = (
+            return_view
+            .sort_values(
+                [
+                    "Product",
+                    "Size Rank",
+                ]
+            )
+            [return_columns]
+        )
+
+        st.dataframe(
+            return_export,
+            width="stretch",
+            hide_index=True,
+            height=520,
+            column_config={
+                "Price": (
+                    st.column_config.NumberColumn(
+                        format="৳%d"
+                    )
+                ),
+                "Total Stock": (
+                    st.column_config.NumberColumn(
+                        format="%d"
+                    )
+                ),
+                "Return Stock": (
+                    st.column_config.NumberColumn(
+                        format="%d"
+                    )
+                ),
+                "Return Value": (
+                    st.column_config.NumberColumn(
+                        format="৳%d"
+                    )
+                ),
+            },
+        )
+
+        st.download_button(
+            "Download return inventory (CSV)",
+            return_export.to_csv(
+                index=False
+            ).encode("utf-8-sig"),
+            "Vibes_Return_Inventory.csv",
+            "text/csv",
+        )
+
+
+# ============================================================
+# COMPLETE SKU DATA
+# ============================================================
+
+with tabs[4]:
+    st.markdown(
+        """
+        <div class="section-title">
+            Complete SKU Data
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
-    bycat["Net External"] = bycat["Safe_Send"] - bycat["Return"]
-    st.dataframe(bycat.sort_values(["Safe_Send","Return"], ascending=False), use_container_width=True, hide_index=True)
 
-    st.markdown("**SKU-level actionable plan**")
-    action_cols = ["Category","Normalized Product","SKU","Color","Size","Salable Stock","WI Stock","Current Physical","Return Stock","Move WI → Mall","Safe Send","Action"]
-    action_grid = plan[action_cols].sort_values(["Action","Category","Normalized Product","Color","Size"])
-    st.dataframe(action_grid, use_container_width=True, hide_index=True, height=520)
+    st.markdown(
+        """
+        <div class="section-sub">
+            Searchable audit table behind every portal number.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
-    safe_only = df[df["Safe Send"] > 0][action_cols]
-    st.download_button("Download Safe Send List (CSV)", safe_only.to_csv(index=False).encode("utf-8-sig"), "Prelegent_Safe_Send_List.csv", "text/csv")
+    raw_query = st.text_input(
+        "Quick search",
+        placeholder=(
+            "Product, SKU, colour, "
+            "size or category"
+        ),
+        key="raw_search",
+    )
 
-# -----------------------------
-# 6. Raw SKU Data
-# -----------------------------
-with pages[5]:
-    st.markdown('<div class="section-title">SKU Data</div>', unsafe_allow_html=True)
-    st.markdown('<div class="section-sub">Searchable audit layer behind every dashboard number.</div>', unsafe_allow_html=True)
-    q = st.text_input("Search SKU / product / colour / size", placeholder="e.g. RFPB, Black, XL, Polo")
-    raw_view = df.copy()
-    if q.strip():
-        mask = pd.Series(False, index=raw_view.index)
-        for c in ["SKU","Normalized Product","Category","Color","Size"]:
-            mask = mask | raw_view[c].astype(str).str.contains(q, case=False, na=False, regex=False)
-        raw_view = raw_view[mask]
-    show_cols = ["Category","Normalized Product","Original Name","SKU","Color","Size","Price","Salable Stock","WI Stock","WI Out Stock","Current Physical","Return Stock","Return Block","Move WI → Mall","Safe Send","Action"]
-    st.dataframe(raw_view[show_cols], use_container_width=True, hide_index=True, height=650)
+    raw_view = filter_inventory(
+        inventory,
+        search_text=raw_query,
+    )
 
-st.caption("VIBES × Prelegent · Decision support portal. Send quantities are planning scenarios and should be validated with sell-through history when available.")
+    raw_columns = [
+        "Category",
+        "Product",
+        "Name",
+        "SKU",
+        "Size",
+        "Color",
+        "Price",
+        "Status",
+        "Stock",
+        "WI Stock",
+        "WI Out Stock",
+        "Total Stock",
+        "Return Stock",
+        "Return Value",
+        "Stock Status",
+        "Return Status",
+        "Brand",
+    ]
+
+    st.dataframe(
+        raw_view[raw_columns],
+        width="stretch",
+        hide_index=True,
+        height=690,
+        column_config={
+            "Price": (
+                st.column_config.NumberColumn(
+                    format="৳%d"
+                )
+            ),
+            "Total Stock": (
+                st.column_config.NumberColumn(
+                    format="%d"
+                )
+            ),
+            "Return Stock": (
+                st.column_config.NumberColumn(
+                    format="%d"
+                )
+            ),
+            "Return Value": (
+                st.column_config.NumberColumn(
+                    format="৳%d"
+                )
+            ),
+        },
+    )
+
+    st.download_button(
+        "Download complete inventory (CSV)",
+        raw_view[raw_columns]
+        .to_csv(index=False)
+        .encode("utf-8-sig"),
+        "Vibes_Complete_Inventory.csv",
+        "text/csv",
+    )
+
+
+st.caption(
+    "VIBES × Prelegent · Every current-stock KPI, chart, "
+    "filter and matrix is based exclusively on Total Stock. "
+    "Returns use Return Stock."
+)

@@ -1277,7 +1277,7 @@ with tabs[0]:
             by_category,
             "Category",
             "Total Stock",
-            "Current Stock by Category (Total Stock)",
+            "Current Available Stock by Category",
         )
 
         if category_figure is not None:
@@ -2125,6 +2125,12 @@ with tabs[2]:
 # ============================================================
 
 with tabs[3]:
+    if not inventory["Returns Available"].any():
+        st.warning(
+            "Return Stock was not included in this workbook. "
+            "The figures below are placeholders only; please request a "
+            "returns report from Prelegent to analyze actual returns."
+        )
     st.markdown(
         """
         <div class="section-title">

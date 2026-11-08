@@ -400,44 +400,83 @@ def canonicalize_case(series):
     )
 
 
+def normalize_inventory_header(value):
+    """Match old/new exporter headings despite case and whitespace changes."""
+    return re.sub(r"\s+", " ", str(value).strip()).casefold()
+
+
 def find_inventory_sheet(file_obj):
     excel_file = pd.ExcelFile(file_obj)
 
-    required = {
-        "Name",
-        "Size",
-        "Color",
-        "SKU",
-        "Total Stock",
-    }
+    required = {"name", "size", "color", "sku"}
+    stock_headers = {"total stock", "salable stock"}
 
     for sheet in excel_file.sheet_names:
         candidate = pd.read_excel(
-            file_obj,
+            excel_file,
             sheet_name=sheet,
         )
-
         columns = {
-            str(column).strip()
+            normalize_inventory_header(column)
             for column in candidate.columns
         }
-
-        if required.issubset(columns):
+        if required.issubset(columns) and columns.intersection(stock_headers):
             return candidate
 
     raise ValueError(
-        "No sheet contains Name, Size, Color, SKU "
-        "and Total Stock columns."
+        "No inventory sheet found. Expected Name, Size, Color, SKU "
+        "and either Salable Stock or Total Stock (case-insensitive)."
     )
 
 
 def prepare_df(raw):
     df = raw.copy()
 
+    standard_headers = {
+        "name": "Name",
+        "size": "Size",
+        "color": "Color",
+        "sku": "SKU",
+        "price": "Price",
+        "brands": "Brands",
+        "status": "Status",
+        "store": "Store",
+        "stock": "Stock",
+        "wi stock": "WI Stock",
+        "wi out stock": "WI Out Stock",
+        "return stock": "Return Stock",
+        "total stock": "Total Stock",
+        "salable stock": "Salable Stock",
+    }
     df.columns = [
-        str(column).strip()
+        standard_headers.get(normalize_inventory_header(column), str(column).strip())
         for column in df.columns
     ]
+    if df.columns.duplicated().any():
+        raise ValueError("Conflicting duplicate column headings in workbook.")
+
+    # The new Prelegent exporter provides both physical and sellable quantities.
+    # Preserve the original physical count; use sellable stock for ALL existing
+    # dashboard summaries, charts, matrices, status labels, filters and exports.
+    source_has_returns = "Return Stock" in df.columns
+    source_has_salable = "Salable Stock" in df.columns
+    if source_has_salable:
+        physical_source = "Total Stock" if "Total Stock" in df.columns else "Salable Stock"
+        df["Physical Total Stock"] = pd.to_numeric(
+            df[physical_source], errors="coerce"
+        ).fillna(0)
+        df["Total Stock"] = pd.to_numeric(
+            df["Salable Stock"], errors="coerce"
+        ).fillna(0)
+    else:
+        if "Total Stock" not in df.columns:
+            raise ValueError("Missing Salable Stock or Total Stock quantity column.")
+        df["Physical Total Stock"] = pd.to_numeric(
+            df["Total Stock"], errors="coerce"
+        ).fillna(0)
+
+    df["Quantity Basis"] = "Salable Stock" if source_has_salable else "Total Stock"
+    df["Returns Available"] = source_has_returns
 
     df = df.dropna(how="all")
 
@@ -940,9 +979,10 @@ with st.sidebar:
 
     st.markdown("---")
     st.caption("Inventory definitions")
-    st.caption("• Current inventory = Total Stock")
-    st.caption("• Low stock = 1–2 total units")
-    st.caption("• Returns = Return Stock")
+    st.caption("• Current inventory = Salable Stock (new exports) / Total Stock (legacy)")
+    st.caption("• Low stock = 1–2 available units")
+    st.caption("• Physical quantity is preserved separately for new exports")
+    st.caption("• Returns shown only when supplied in the source file")
     st.caption("• Size aliases are normalized")
     st.caption(
         "• Product names are grouped case-insensitively"
@@ -967,6 +1007,14 @@ try:
         )
 
         data_label = DEFAULT_FILE.name
+
+    if not inventory["Returns Available"].any():
+        st.info("This file does not provide Return Stock. Return quantities and values are unavailable, not confirmed zero.")
+    if inventory["Quantity Basis"].eq("Salable Stock").any():
+        st.caption(
+            "Available stock uses Salable Stock; original physical Total stock "
+            "is retained as Physical Total Stock."
+        )
 
 except Exception as exc:
     st.error(
@@ -1121,6 +1169,9 @@ with tabs[0]:
         """,
         unsafe_allow_html=True,
     )
+
+    if not inventory["Returns Available"].any():
+        st.warning("Return data is not present in this export; the return KPIs below are placeholders, not measured zero returns.")
 
     return_cards = st.columns(4)
 
@@ -1398,7 +1449,7 @@ with tabs[1]:
             <b>{len(filtered):,}</b> matching SKU rows ·
             <b>{filtered["Product"].nunique():,}</b> products ·
             <b>{fmt_int(filtered["Total Stock"].sum())}</b>
-            current units from Total Stock
+            available units from the selected stock quantity
         </div>
         """,
         unsafe_allow_html=True,
